@@ -1,7 +1,7 @@
 use std::env;
-use std::error::Error;
-use std::fs;
 use std::process;
+
+use minigrep::Config;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -12,40 +12,8 @@ fn main() {
     });
 
     // Use `if let Err(e)` to handle functions that only return errors
-    if let Err(e) = run(config) {
+    if let Err(e) = minigrep::run(config) {
         println!("Application error: {e}");
         process::exit(1);
     }
-}
-
-struct Config {
-    query: String,
-    file_path: String,
-}
-
-impl Config {
-    // NOTE: Use string to return errors since we're not using
-    // predefined error types
-    fn build(args: &[String]) -> Result<Config, &str> {
-        if args.len() < 3 {
-            return Err("Not enough arguments!");
-        }
-        let query = args[1].clone();
-        let file_path = args[2].clone();
-
-        Ok(Config { query, file_path })
-    }
-}
-
-// NOTE: Use `Box<dyn Error>` to return dynamic error types
-fn run(config: Config) -> Result<(), Box<dyn Error>> {
-    println!("Searching for: {}", config.query);
-    println!("In file: {}", config.file_path);
-
-    // NOTE: Propagate errors with `?`
-    let contents = fs::read_to_string(config.file_path)?;
-
-    println!("With text:\n {}", contents);
-
-    Ok(())
 }
