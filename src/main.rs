@@ -5,11 +5,13 @@ use std::process;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
+    // NOTE: Use `unwrap_or_else` to handle errors in the outermost layer
     let config = Config::build(&args).unwrap_or_else(|err| {
         println!("Problem parsing arguments: {err}");
         process::exit(1);
     });
 
+    // Use `if let Err(e)` to handle functions that only return errors
     if let Err(e) = run(config) {
         println!("Application error: {e}");
         process::exit(1);
@@ -22,6 +24,8 @@ struct Config {
 }
 
 impl Config {
+    // NOTE: Use string to return errors since we're not using
+    // predefined error types
     fn build(args: &[String]) -> Result<Config, &str> {
         if args.len() < 3 {
             return Err("Not enough arguments!");
@@ -33,10 +37,12 @@ impl Config {
     }
 }
 
+// NOTE: Use `Box<dyn Error>` to return dynamic error types
 fn run(config: Config) -> Result<(), Box<dyn Error>> {
     println!("Searching for: {}", config.query);
     println!("In file: {}", config.file_path);
 
+    // NOTE: Propagate errors with `?`
     let contents = fs::read_to_string(config.file_path)?;
 
     println!("With text:\n {}", contents);
