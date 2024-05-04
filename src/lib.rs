@@ -69,6 +69,7 @@ pub fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a st
     results
 }
 
+// NOTE: Unit tests go in the same file as the code
 #[cfg(test)]
 mod tests {
     use super::*;
