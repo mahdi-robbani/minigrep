@@ -1,4 +1,5 @@
 use std::env;
+use std::error::Error;
 use std::fs;
 use std::process;
 
@@ -9,13 +10,10 @@ fn main() {
         process::exit(1);
     });
 
-    println!("Searching for: {}", config.query);
-    println!("In file: {}", config.file_path);
-
-    let contents =
-        fs::read_to_string(config.file_path).expect("Should have been able to read the file");
-
-    println!("With text:\n {}", contents);
+    if let Err(e) = run(config) {
+        println!("Application error: {e}");
+        process::exit(1);
+    }
 }
 
 struct Config {
@@ -26,11 +24,22 @@ struct Config {
 impl Config {
     fn build(args: &[String]) -> Result<Config, &str> {
         if args.len() < 3 {
-            return Err("Not enough arguments!")
+            return Err("Not enough arguments!");
         }
         let query = args[1].clone();
         let file_path = args[2].clone();
 
         Ok(Config { query, file_path })
     }
+}
+
+fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    println!("Searching for: {}", config.query);
+    println!("In file: {}", config.file_path);
+
+    let contents = fs::read_to_string(config.file_path)?;
+
+    println!("With text:\n {}", contents);
+
+    Ok(())
 }
